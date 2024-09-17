@@ -43,6 +43,13 @@ export default class Order {
     return true;
   }
 
+  addItem(orderItem: OrderItem) {
+    if (this._items.includes(orderItem)) {
+      throw new Error("Item already added");
+    }
+    this._items.push(orderItem);
+  }
+
   total(): number {
     return this._items.reduce((acc, item) => acc + item.total(), 0);
   }
