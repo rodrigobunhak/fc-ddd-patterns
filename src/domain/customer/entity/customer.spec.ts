@@ -1,5 +1,11 @@
+import EventDispatcher from "../../@shared/event/event-dispatcher";
+import CustomerCreatedEvent from "../event/customer-created.event";
+import SendConsoleLogHandler from "../event/handler/send-console-log.handler";
+import SendConsoleLog1Handler from "../event/handler/send-console-log1.handler";
+import SendConsoleLog2Handler from "../event/handler/send-console-log2.handler";
 import Address from "../value-object/address";
 import Customer from "./customer";
+import { v4 as uuid } from "uuid";
 
 describe("Customer unit tests", () => {
   it("should throw error when id is empty", () => {
@@ -60,4 +66,43 @@ describe("Customer unit tests", () => {
     customer.addRewardPoints(10);
     expect(customer.rewardPoints).toBe(20);
   });
+
+  it("should call 'SendConsoleLog1Handler' when customer is created", () => {
+    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
+    const eventDispatcher = new EventDispatcher();
+    const eventHandler = new SendConsoleLog1Handler();
+    const spyEventHandler = jest.spyOn(eventHandler, "handle");
+    eventDispatcher.register("CustomerCreatedEvent", eventHandler);
+    const customer = new Customer(uuid(), "John", eventDispatcher);
+    expect(spyEventHandler).toHaveBeenCalled();
+    expect(spyConsoleLog).toHaveBeenCalledWith("Esse é o primeiro console.log do evento: CustomerCreated");
+    spyConsoleLog.mockRestore();
+  })
+
+  it("should call 'SendConsoleLog2Handler' when customer is created", () => {
+    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
+    const eventDispatcher = new EventDispatcher();
+    const eventHandler = new SendConsoleLog2Handler();
+    const spyEventHandler = jest.spyOn(eventHandler, "handle");
+    eventDispatcher.register("CustomerCreatedEvent", eventHandler);
+    const customer = new Customer(uuid(), "John", eventDispatcher);
+    expect(spyEventHandler).toHaveBeenCalled();
+    expect(spyConsoleLog).toHaveBeenCalledWith("Esse é o segundo console.log do evento: CustomerCreated");
+    spyConsoleLog.mockRestore();
+  })
+
+  it("should call 'SendConsoleLogHandler' when customer address is changed", () => {
+    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
+    const eventDispatcher = new EventDispatcher();
+    const eventHandler = new SendConsoleLogHandler();
+    const spyEventHandler = jest.spyOn(eventHandler, "handle");
+    eventDispatcher.register("CustomerAddressChangedEvent", eventHandler);
+    const customer = new Customer(uuid(), "John", eventDispatcher);
+    const address = new Address("Street 1", 123, "13330-250", "São Paulo");
+    customer.changeAddress(address)
+    expect(spyEventHandler).toHaveBeenCalled();
+    const logMessage = `Endereço do cliente: ${customer.id}, ${customer.name} alterado para: ${customer.Address}`;
+    expect(spyConsoleLog).toHaveBeenCalledWith(logMessage);
+    spyConsoleLog.mockRestore();
+  })
 });
