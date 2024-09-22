@@ -1,25 +1,22 @@
-import EventDispatcherInterface from "../../@shared/event/event-dispatcher.interface";
+import Aggregate from "../../@shared/aggregate";
 import CustomerAddressChangedEvent from "../event/customer-address-changed.event";
 import CustomerCreatedEvent from "../event/customer-created.event";
 import Address from "../value-object/address";
 
-export default class Customer {
+export default class Customer extends Aggregate {
   private _id: string;
   private _name: string = "";
   private _address!: Address;
   private _active: boolean = false;
   private _rewardPoints: number = 0;
-  private _eventDispatcher?: EventDispatcherInterface
 
-  constructor(id: string, name: string, evenDispatcher?: EventDispatcherInterface) {
+  constructor(id: string, name: string) {
+    super();
     this._id = id;
     this._name = name;
-    this._eventDispatcher = evenDispatcher;
     this.validate();
-    if (evenDispatcher) {
-      const customerCreatedEvent = new CustomerCreatedEvent(name);
-      this._eventDispatcher.notify(customerCreatedEvent)
-    }
+    const customerCreatedEvent = new CustomerCreatedEvent(name);
+    this.addDomainEvent(customerCreatedEvent);
   }
 
   get id(): string {
@@ -54,10 +51,8 @@ export default class Customer {
   
   changeAddress(address: Address) {
     this._address = address;
-    if (this._eventDispatcher) {
-      const customerAddressChangedEvent = new CustomerAddressChangedEvent(this);
-      this._eventDispatcher.notify(customerAddressChangedEvent);
-    }
+    const customerAddressChangedEvent = new CustomerAddressChangedEvent(this);
+    this.addDomainEvent(customerAddressChangedEvent);
   }
 
   isActive(): boolean {

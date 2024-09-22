@@ -1,5 +1,4 @@
 import EventDispatcher from "../../@shared/event/event-dispatcher";
-import CustomerCreatedEvent from "../event/customer-created.event";
 import SendConsoleLogHandler from "../event/handler/send-console-log.handler";
 import SendConsoleLog1Handler from "../event/handler/send-console-log1.handler";
 import SendConsoleLog2Handler from "../event/handler/send-console-log2.handler";
@@ -67,39 +66,57 @@ describe("Customer unit tests", () => {
     expect(customer.rewardPoints).toBe(20);
   });
 
-  it("should call 'SendConsoleLog1Handler' when customer is created", () => {
-    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
+  it("should notify handler SendConsoleLog1Handler when customer is created", () => {
     const eventDispatcher = new EventDispatcher();
     const eventHandler = new SendConsoleLog1Handler();
     const spyEventHandler = jest.spyOn(eventHandler, "handle");
+    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
     eventDispatcher.register("CustomerCreatedEvent", eventHandler);
-    const customer = new Customer(uuid(), "John", eventDispatcher);
+
+    const customer = new Customer(uuid(), "John");
+    customer.domainEvents.forEach(domainEvent => {
+      eventDispatcher.notify(domainEvent);
+    });
+    customer.clearEvents();
+
     expect(spyEventHandler).toHaveBeenCalled();
     expect(spyConsoleLog).toHaveBeenCalledWith("Esse é o primeiro console.log do evento: CustomerCreated");
     spyConsoleLog.mockRestore();
   })
 
-  it("should call 'SendConsoleLog2Handler' when customer is created", () => {
-    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
+  it("should notify handler SendConsoleLog2Handler when customer is created", () => {
     const eventDispatcher = new EventDispatcher();
     const eventHandler = new SendConsoleLog2Handler();
     const spyEventHandler = jest.spyOn(eventHandler, "handle");
+    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
     eventDispatcher.register("CustomerCreatedEvent", eventHandler);
-    const customer = new Customer(uuid(), "John", eventDispatcher);
+
+    const customer = new Customer(uuid(), "John");
+    customer.domainEvents.forEach(domainEvent => {
+      eventDispatcher.notify(domainEvent);
+    })
+    customer.clearEvents();
+
     expect(spyEventHandler).toHaveBeenCalled();
     expect(spyConsoleLog).toHaveBeenCalledWith("Esse é o segundo console.log do evento: CustomerCreated");
     spyConsoleLog.mockRestore();
   })
 
-  it("should call 'SendConsoleLogHandler' when customer address is changed", () => {
-    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
+  it("should notify handler SendConsoleLogHandler when customer address is updated", () => {
     const eventDispatcher = new EventDispatcher();
     const eventHandler = new SendConsoleLogHandler();
     const spyEventHandler = jest.spyOn(eventHandler, "handle");
-    eventDispatcher.register("CustomerAddressChangedEvent", eventHandler);
-    const customer = new Customer(uuid(), "John", eventDispatcher);
+    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
+    eventDispatcher.register('CustomerAddressChangedEvent', eventHandler);
+
+    const customer = new Customer(uuid(), "John");
     const address = new Address("Street 1", 123, "13330-250", "São Paulo");
-    customer.changeAddress(address)
+    customer.changeAddress(address);
+    customer.domainEvents.forEach(domainEvent => {
+      eventDispatcher.notify(domainEvent);
+    });
+    customer.clearEvents();
+
     expect(spyEventHandler).toHaveBeenCalled();
     const logMessage = `Endereço do cliente: ${customer.id}, ${customer.name} alterado para: ${customer.Address}`;
     expect(spyConsoleLog).toHaveBeenCalledWith(logMessage);
