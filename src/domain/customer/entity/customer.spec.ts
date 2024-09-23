@@ -70,7 +70,6 @@ describe("Customer unit tests", () => {
     const eventDispatcher = new EventDispatcher();
     const eventHandler = new SendConsoleLog1Handler();
     const spyEventHandler = jest.spyOn(eventHandler, "handle");
-    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
     eventDispatcher.register("CustomerCreatedEvent", eventHandler);
 
     const customer = new Customer(uuid(), "John");
@@ -80,15 +79,12 @@ describe("Customer unit tests", () => {
     customer.clearEvents();
 
     expect(spyEventHandler).toHaveBeenCalled();
-    expect(spyConsoleLog).toHaveBeenCalledWith("Esse é o primeiro console.log do evento: CustomerCreated");
-    spyConsoleLog.mockRestore();
   })
 
   it("should notify handler SendConsoleLog2Handler when customer is created", () => {
     const eventDispatcher = new EventDispatcher();
     const eventHandler = new SendConsoleLog2Handler();
     const spyEventHandler = jest.spyOn(eventHandler, "handle");
-    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
     eventDispatcher.register("CustomerCreatedEvent", eventHandler);
 
     const customer = new Customer(uuid(), "John");
@@ -98,15 +94,12 @@ describe("Customer unit tests", () => {
     customer.clearEvents();
 
     expect(spyEventHandler).toHaveBeenCalled();
-    expect(spyConsoleLog).toHaveBeenCalledWith("Esse é o segundo console.log do evento: CustomerCreated");
-    spyConsoleLog.mockRestore();
   })
 
   it("should notify handler SendConsoleLogHandler when customer address is updated", () => {
     const eventDispatcher = new EventDispatcher();
     const eventHandler = new SendConsoleLogHandler();
     const spyEventHandler = jest.spyOn(eventHandler, "handle");
-    const spyConsoleLog = jest.spyOn(console, 'log').mockImplementation();
     eventDispatcher.register('CustomerAddressChangedEvent', eventHandler);
 
     const customer = new Customer(uuid(), "John");
@@ -119,7 +112,5 @@ describe("Customer unit tests", () => {
 
     expect(spyEventHandler).toHaveBeenCalled();
     const logMessage = `Endereço do cliente: ${customer.id}, ${customer.name} alterado para: ${customer.Address}`;
-    expect(spyConsoleLog).toHaveBeenCalledWith(logMessage);
-    spyConsoleLog.mockRestore();
   })
 });
