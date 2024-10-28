@@ -1,6 +1,7 @@
 import Customer from "../../../domain/customer/entity/customer";
 import Address from "../../../domain/customer/value-object/address";
 import { InputUpdateCustomerDto } from "./update.customer.dto";
+import UpdateCustomerUseCase from "./update.customer.usecase";
 
 const customer = new Customer("123", "John");
 const address = new Address("Street", 123, "Zip", "City");
