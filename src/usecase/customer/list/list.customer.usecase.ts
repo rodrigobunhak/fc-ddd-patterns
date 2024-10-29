@@ -16,9 +16,9 @@ export default class ListCustomerUseCase {
 }
 
 class OutputMapper {
-  static toOutput(customer: Customer[]): OutputListCustomerDto {
+  static toOutput(customers: Customer[]): OutputListCustomerDto {
     return {
-      customers: customer.map((customer) => ({
+      customers: customers.map((customer) => ({
         id: customer.id,
         name: customer.name,
         address: {
