@@ -33,18 +33,6 @@ export default class Customer extends Entity {
 
   validate() {
     CustomerValidatorFactory.create().validate(this);
-    // if (this.id.length === 0) {
-    //   this.notification.addError({
-    //     context: "customer",
-    //     message: "Id is required"
-    //   })
-    // }
-    // if (this._name.length === 0) {
-    //   this.notification.addError({
-    //     context: "customer",
-    //     message: "Name is required"
-    //   })
-    // }
   }
 
   changeName(name: string) {
