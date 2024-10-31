@@ -1,10 +1,11 @@
-import Aggregate from "../../@shared/aggregate";
+import Entity from "../../@shared/entity/entity.abstract";
+import NotificationError from "../../@shared/notification/notification.error";
 import CustomerAddressChangedEvent from "../event/customer-address-changed.event";
 import CustomerCreatedEvent from "../event/customer-created.event";
+import CustomerValidatorFactory from "../factory/customer.validator.factory";
 import Address from "../value-object/address";
 
-export default class Customer extends Aggregate {
-  private _id: string;
+export default class Customer extends Entity {
   private _name: string = "";
   private _address!: Address;
   private _active: boolean = false;
@@ -17,10 +18,9 @@ export default class Customer extends Aggregate {
     this.validate();
     const customerCreatedEvent = new CustomerCreatedEvent(name);
     this.addDomainEvent(customerCreatedEvent);
-  }
-
-  get id(): string {
-    return this._id;
+    if (this.notification.hasErrors()) {
+      throw new NotificationError(this.notification.getErrors());
+    }
   }
 
   get name(): string {
@@ -32,12 +32,19 @@ export default class Customer extends Aggregate {
   }
 
   validate() {
-    if (this._id.length === 0) {
-      throw new Error("Id is required");
-    }
-    if (this._name.length === 0) {
-      throw new Error("Name is required");
-    }
+    CustomerValidatorFactory.create().validate(this);
+    // if (this.id.length === 0) {
+    //   this.notification.addError({
+    //     context: "customer",
+    //     message: "Id is required"
+    //   })
+    // }
+    // if (this._name.length === 0) {
+    //   this.notification.addError({
+    //     context: "customer",
+    //     message: "Name is required"
+    //   })
+    // }
   }
 
   changeName(name: string) {

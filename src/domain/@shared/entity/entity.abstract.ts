@@ -1,7 +1,18 @@
-import EventInterface from "./event/event.interface";
+import EventInterface from "../event/event.interface";
+import Notification from "../notification/notification";
 
-export default abstract class Aggregate {
+export default abstract class Entity {
+  protected _id: string
+  public notification: Notification;
   private _domainEvents: EventInterface[] = []; 
+
+  constructor() {
+    this.notification = new Notification()
+  }
+
+  get id(): string {
+    return this._id;
+  }
 
   get domainEvents(): EventInterface[] {
     return this._domainEvents;
